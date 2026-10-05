@@ -4,6 +4,7 @@ import FlattenedChart from "./FlattenedChart";
 import FoldedChart from "./FoldedChart";
 import PeriodogramChart from "./PeriodogramChart";
 import TransitAnimation from "./TransitAnimation";
+import VettingPanel from "./VettingPanel";
 
 function Stat({ label, value, hint }) {
   return (
@@ -21,7 +22,7 @@ function MatchNote({ signal }) {
     return (
       <p className="text-sm">
         <span className="font-medium">No known planet at this period.</span>{" "}
-        <span className="text-dim">It could be new, or a false alarm. Phase 3's vetting model will help tell which.</span>
+        <span className="text-dim">It could be new, or a false alarm. Check the vetting score below.</span>
       </p>
     );
   }
@@ -57,6 +58,16 @@ function Candidate({ signal, index }) {
           hint={oddEvenWarn ? "Worth a closer look: two eclipsing stars can alternate depths" : "Consistent, as a planet's should be"}
         />
         <Stat label="Peak strength (SDE)" value={signal.sde} />
+      </div>
+
+      <div>
+        <h4 className="font-medium">Planet or impostor?</h4>
+        <p className="text-sm text-dim">
+          Most planet-like dips turn out to be something else, usually two stars eclipsing each other. A model trained on Kepler's verdicts scores this one.
+        </p>
+        <div className="mt-2">
+          <VettingPanel vetting={signal.vetting} signal={signal} />
+        </div>
       </div>
 
       <div>

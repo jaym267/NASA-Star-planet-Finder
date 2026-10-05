@@ -16,3 +16,7 @@ export function fetchLightCurve(target, mission) {
 export function searchTransits(target, mission, observations) {
   return getJson("/api/search", { target, mission, observations });
 }
+
+export function fetchModelInfo() {
+  return getJson("/api/model", {});
+}

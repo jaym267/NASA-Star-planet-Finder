@@ -1,0 +1,4 @@
+# Extra packages for the notebooks in /notebooks (install on top of requirements.txt)
+pandas>=2.0
+matplotlib>=3.8
+jupyter>=1.0
