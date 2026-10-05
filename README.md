@@ -9,7 +9,7 @@ When a planet passes in front of its star, the star dims slightly. This app pull
 - [x] **Phase 1: Data explorer.** Look up a star and plot its light curve.
 - [x] **Phase 2: Transit search.** Find repeating dips with Box Least Squares, fold them, and animate the transit.
 - [x] **Phase 3: Vetting model.** Score how planet-like a signal is.
-- [ ] **Phase 4: Planet comparison dashboard.**
+- [x] **Phase 4: Planet comparison dashboard.** Place candidates among every confirmed planet.
 - [ ] **Phase 5: Theory workspace.**
 - [ ] **Phase 6: Submit candidates to ExoFOP.**
 
@@ -75,6 +75,20 @@ A random forest trained on the Kepler KOI table: 2,748 confirmed planets vs. 4,8
 - **Results** (5-fold cross-validation grouped by star): ROC AUC 0.963 and accuracy 90%, vs. 64% for always guessing "false positive". It keeps 92% of real planets.
 - **Our rediscoveries:** Kepler-10 c 97%, pi Men c 95%, TOI-700 c 85%, Kepler-10 b 65% ("uncertain"; orbits under a day are where many Kepler false positives sit).
 - **Retrain:** `pip install -r backend/requirements-notebooks.txt`, then run `notebooks/vetting_model.ipynb`. It writes `backend/models/vetting_rf.joblib`.
+
+## Comparison dashboard (Phase 4)
+
+The **Compare** tab places your candidates among all ~6,400 confirmed planets. `GET /api/planets` serves the NASA Exoplanet Archive's composite table from a local SQLite copy (`data/cache/`, refreshed weekly).
+
+- **Size vs. orbit:** the radius valley at 1.5 to 2 × Earth.
+- **How common is each size:** a histogram binned evenly on a log scale, so the valley isn't distorted.
+- **Mass vs. size:** a candidate appears as a line, since a transit measures size but not mass.
+- **Habitable zone:** light received vs. star temperature, with the Kopparapu et al. (2014) conservative zone.
+- **Filter:** all stars, red dwarfs, or Sun-like stars.
+
+Each search signal also returns `derived`: orbit size, light received, equilibrium temperature, and habitable-zone position. These are computed from the period and the star's radius, temperature, and surface gravity.
+
+**Data honesty:** the composite table fills gaps with formula estimates. Non-transiting planets get radii from a mass-radius relation, and many transiting planets get masses the same way. The charts plot only measured values: transit radii (4,740 planets), and for mass vs. size, planets with a measured mass too (1,749).
 
 ## Project layout
 

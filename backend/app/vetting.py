@@ -120,7 +120,9 @@ def score_signal(signal: dict, star: dict, mission: str) -> dict | None:
     if model is None:
         return None
     feats = features_from_signal(signal, star)
-    row = [[feats[f] for f in FEATURES]]
+    import pandas as pd  # installed with lightkurve
+
+    row = pd.DataFrame([[feats[f] for f in FEATURES]], columns=FEATURES)
     prob = float(model.predict_proba(row)[0][1])
     missing = [FEATURE_LABELS[f] for f in FEATURES if math.isnan(feats[f])]
     notes = []

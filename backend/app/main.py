@@ -1,12 +1,15 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
+from .archive import all_planets, derived_properties, hz_curve
 from .lightcurves import LightCurveNotFound, get_light_curve
 from .transit_search import search_transits
 from .vetting import model_info, score_signal
 
-app = FastAPI(title="NASA Star Planet Finder API", version="0.3.0")
+app = FastAPI(title="NASA Star Planet Finder API", version="0.4.0")
 
+app.add_middleware(GZipMiddleware, minimum_size=2000)  # chart payloads shrink ~5x
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -53,7 +56,17 @@ def search(
     # Scored on every request (not cached) so a retrained model applies to old searches too
     for signal in result["signals"]:
         signal["vetting"] = score_signal(signal, result["star"], result["mission"])
+        signal["derived"] = derived_properties(signal, result["star"])
     return result
+
+
+@app.get("/api/planets")
+def planets():
+    """Every confirmed exoplanet (NASA Exoplanet Archive), plus the habitable zone's edges."""
+    try:
+        return {**all_planets(), "habitable_zone": hz_curve()}
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Couldn't load the Exoplanet Archive: {e}")
 
 
 @app.get("/api/model")

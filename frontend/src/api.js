@@ -20,3 +20,7 @@ export function searchTransits(target, mission, observations) {
 export function fetchModelInfo() {
   return getJson("/api/model", {});
 }
+
+export function fetchPlanets() {
+  return getJson("/api/planets", {});
+}
