@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { fetchLightCurve } from "./api";
+import { useEffect, useState } from "react";
+import { fetchLightCurve, searchTransits } from "./api";
 import LightCurveChart from "./LightCurveChart";
+import SearchResults from "./SearchResults";
 
 const EXAMPLES = ["TOI-700", "Pi Mensae", "Kepler-10"];
 
@@ -10,6 +11,32 @@ export default function App() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [observations, setObservations] = useState(4);
+  const [search, setSearch] = useState(null);
+  const [searchError, setSearchError] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!searching) return;
+    const started = Date.now();
+    const id = setInterval(() => setElapsed(Math.round((Date.now() - started) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, [searching]);
+
+  async function runSearch() {
+    setSearching(true);
+    setElapsed(0);
+    setSearchError("");
+    setSearch(null);
+    try {
+      setSearch(await searchTransits(data.target, data.mission, observations));
+    } catch (e) {
+      setSearchError(e.message);
+    } finally {
+      setSearching(false);
+    }
+  }
 
   async function load(name = target, m = mission) {
     if (!name.trim()) {
@@ -18,6 +45,8 @@ export default function App() {
     }
     setLoading(true);
     setError("");
+    setSearch(null);
+    setSearchError("");
     try {
       setData(await fetchLightCurve(name.trim(), m));
     } catch (e) {
@@ -98,6 +127,46 @@ export default function App() {
           </p>
           <LightCurveChart data={data} />
           <p className="text-sm text-dim">Drag on the chart to zoom in. Double-click to reset.</p>
+        </section>
+      )}
+
+      {data && (
+        <section className="mt-12 border-t border-ink-light pt-10">
+          <h2 className="text-2xl font-semibold tracking-tight">Search for planets</h2>
+          <p className="mt-2 max-w-2xl text-dim">
+            Combine several {data.mission === "TESS" ? "sectors" : "quarters"} of data, then test thousands of possible orbits
+            for a dip that repeats on schedule. This uses the Box Least Squares method. More data finds smaller planets and
+            longer orbits, but takes longer.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <label className="text-sm text-dim" htmlFor="observations">
+              {data.mission === "TESS" ? "Sectors" : "Quarters"} to search
+            </label>
+            <select
+              id="observations"
+              value={observations}
+              onChange={(e) => setObservations(Number(e.target.value))}
+              className="rounded-md border border-ink-light bg-ink-light px-3 py-2"
+            >
+              {[2, 4, 6, 8].map((n) => (
+                <option key={n} value={n} disabled={n > data.available_observations}>{n}</option>
+              ))}
+            </select>
+            <button
+              onClick={runSearch}
+              disabled={searching}
+              className="rounded-md bg-star px-5 py-2 font-medium text-ink disabled:opacity-60"
+            >
+              {searching ? `Searching… ${elapsed}s` : "Find transits"}
+            </button>
+          </div>
+          {searching && (
+            <p className="mt-3 text-sm text-dim">
+              Downloading from NASA and testing orbits. The first search of a star usually takes 1 to 3 minutes. After that it's cached.
+            </p>
+          )}
+          {searchError && <p className="mt-4 text-danger">{searchError}</p>}
+          {search && <SearchResults key={`${search.target}-${search.observations_used.length}`} data={search} />}
         </section>
       )}
     </main>

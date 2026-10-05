@@ -20,6 +20,7 @@ class LightCurveNotFound(Exception):
 
 
 def _cache_path(target: str, mission: str) -> Path:
+    """JSON cache file for a result; also used by the transit search."""
     safe = re.sub(r"[^A-Za-z0-9_-]+", "_", f"{mission}_{target}").strip("_")
     return CACHE_DIR / f"{safe}.json"
 
@@ -53,7 +54,9 @@ def get_light_curve(target: str, mission: str = "TESS") -> dict:
 
     # Phase 1: just the first available sector/quarter.
     lc = results[0].download(download_dir=str(CACHE_DIR / "raw"))
-    lc = lc.remove_nans().normalize().remove_outliers(sigma=5)
+    # Clip only upward outliers (cosmic rays, flares); a deep transit is a real
+    # downward "outlier" we must keep.
+    lc = lc.remove_nans().normalize().remove_outliers(sigma_upper=5, sigma_lower=float("inf"))
 
     time = np.asarray(lc.time.value, dtype=float)
     flux = np.asarray(lc.flux.value, dtype=float)
