@@ -14,7 +14,7 @@ import urllib.request
 
 from .lightcurves import CACHE_DIR
 
-DB_PATH = CACHE_DIR / "exoplanets_v2.sqlite"  # bump the name when COLUMNS change
+DB_PATH = CACHE_DIR / "exoplanets_v3.sqlite"  # bump the name when COLUMNS change
 TAP_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 MAX_AGE_SECONDS = 7 * 24 * 3600
 
@@ -30,6 +30,7 @@ COLUMNS = {
     "st_rad": "REAL",         # star radius, Sun radii
     "st_mass": "REAL",        # star mass, Sun masses
     "sy_dist": "REAL",        # distance, parsecs
+    "sy_jmag": "REAL",        # star's near-infrared (J band) brightness, for JWST target ranking
     "discoverymethod": "TEXT",
     "disc_year": "INTEGER",
     # Provenance. This table fills gaps with estimates: radii of non-transiting planets and many

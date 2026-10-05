@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchLightCurve, searchTransits } from "./api";
 import CompareDashboard from "./CompareDashboard";
+import TheoryWorkspace from "./TheoryWorkspace";
 import LightCurveChart from "./LightCurveChart";
 import SearchResults from "./SearchResults";
 
@@ -63,7 +64,7 @@ export default function App() {
     <main className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="text-4xl font-semibold tracking-tight">Star Planet Finder</h1>
       <nav className="mt-6 flex gap-1 border-b border-ink-light" role="tablist">
-        {[["find", "Find"], ["compare", "Compare"]].map(([key, label]) => (
+        {[["find", "Find"], ["compare", "Compare"], ["theorize", "Theorize"]].map(([key, label]) => (
           <button
             key={key}
             role="tab"
@@ -82,6 +83,16 @@ export default function App() {
             See how your candidates measure up against every planet astronomers have confirmed, and look for patterns worth testing.
           </p>
           <CompareDashboard search={search} />
+        </>
+      )}
+
+      {view === "theorize" && (
+        <>
+          <p className="mt-6 max-w-2xl text-dim">
+            Turn patterns into ideas you can test. Keep notes on a question, and ask Claude to explain results or check ideas
+            against the planet archive.
+          </p>
+          <TheoryWorkspace search={search} />
         </>
       )}
 

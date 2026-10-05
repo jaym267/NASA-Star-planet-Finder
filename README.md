@@ -10,7 +10,7 @@ When a planet passes in front of its star, the star dims slightly. This app pull
 - [x] **Phase 2: Transit search.** Find repeating dips with Box Least Squares, fold them, and animate the transit.
 - [x] **Phase 3: Vetting model.** Score how planet-like a signal is.
 - [x] **Phase 4: Planet comparison dashboard.** Place candidates among every confirmed planet.
-- [ ] **Phase 5: Theory workspace.**
+- [x] **Phase 5: Theory workspace.** Notebooks plus a Claude assistant that checks ideas against the archive.
 - [ ] **Phase 6: Submit candidates to ExoFOP.**
 
 ## Stack
@@ -89,6 +89,16 @@ The **Compare** tab places your candidates among all ~6,400 confirmed planets. `
 Each search signal also returns `derived`: orbit size, light received, equilibrium temperature, and habitable-zone position. These are computed from the period and the star's radius, temperature, and surface gravity.
 
 **Data honesty:** the composite table fills gaps with formula estimates. Non-transiting planets get radii from a mass-radius relation, and many transiting planets get masses the same way. The charts plot only measured values: transit radii (4,740 planets), and for mass vs. size, planets with a measured mass too (1,749).
+
+## Theory workspace (Phase 5)
+
+The **Theorize** tab holds notebooks: a question you're investigating, your notes (autosaved), an optional snapshot of a candidate, and a conversation with Claude.
+
+- **Setup:** create `backend/.env` containing `ANTHROPIC_API_KEY=...` (git-ignored), then restart the backend. Notes work without a key.
+- **Model:** Claude Opus 5.5 (`claude-opus-5-5`), streamed, at `medium` effort. Server-side refusal fallback (`fallbacks: "default"`) is on, so if a safety classifier declines, Anthropic retries on its recommended model.
+- **Grounded in data:** Claude calls tools that query the local archive: `query_planets` (counts and medians for any filter), `size_distribution` (log-binned radius histogram), and `jwst_targets` (Transmission Spectroscopy Metric ranking, Kempton et al. 2018). The answers show which checks it ran.
+- **Storage:** `data/user/notebooks.sqlite` (git-ignored). Conversations are stored exactly as the API returns them and only ever appended to. A failed turn is never saved.
+- **Not real accounts yet:** each browser makes up an ID and sends it as `X-User-Id`. That keeps notebooks separate locally, but it is **not authentication**. Real logins are required before deploying for other people.
 
 ## Project layout
 
