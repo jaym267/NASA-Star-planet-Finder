@@ -1,0 +1,17 @@
+[
+  {
+    "name": "TOI-700",
+    "mission": "TESS",
+    "why": "Red dwarf with several known planets, including Earth-sized TOI-700 d in the habitable zone."
+  },
+  {
+    "name": "Pi Mensae",
+    "mission": "TESS",
+    "why": "Bright Sun-like star; its transiting super-Earth was one of TESS's first discoveries."
+  },
+  {
+    "name": "Kepler-10",
+    "mission": "Kepler",
+    "why": "Host of Kepler-10b, Kepler's first confirmed rocky planet. Good test for Kepler data."
+  }
+]

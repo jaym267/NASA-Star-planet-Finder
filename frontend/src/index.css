@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0f1b2d;
+  --color-ink-light: #1a2a42;
+  --color-paper: #e9e4d6;
+  --color-dim: #8a9bb3;
+  --color-star: #f2a541;
+  --color-danger: #f08a7e;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+}
+
+body {
+  @apply bg-ink text-paper font-sans antialiased;
+}
